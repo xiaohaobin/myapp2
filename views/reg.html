@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>注册</title>
+		<% include header.html %>
+		
+		
+	</head>
+	<body>
+		<div>
+			<h2>注册页面</h2>
+			<form>
+			  <div class="form-group">
+			    <label for="username">用户名</label>
+			    <input type="text" class="form-control" id="username" placeholder="用户名">
+			  </div>
+			  <div class="form-group">
+			    <label for="password">密码</label>
+			    <input type="password" class="form-control" id="password" placeholder="password">
+			  </div>
+			   <div class="form-group">
+			    <label for="password2">确认密码</label>
+			    <input type="password2" class="form-control" id="password" placeholder="确认密码">
+			  </div>
+			  
+			  <button type="button" class="btn btn-default" onclick="regFn()">保存</button>
+			</form>
+		</div>
+		
+		<% include footer.html %>
+		
+		<script type="text/javascript">
+			//注册
+			function regFn(){
+				$.ajax({
+					type:"post",
+					url:"/doReg",
+					async:true,
+					data:{
+						username:$("#username").val(),
+						password:$("#password").val()
+					},
+					dataType:"json",
+					success:function(data){
+						console.log(data,"succ")
+						
+						if(data.code == 200){
+							alert(data.msg);
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+</html>

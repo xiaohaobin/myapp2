@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<% include header.html %>
+	</head>
+
+	<body>
+		<h2>登录页面</h2>
+		<div class="container-fluid">
+			<!--表单提交给当前页面-->
+			<form class="form-horizontal" method="post">
+				<fieldset>
+					<legend>用户登陆</legend>
+					<div class="control-group">
+						<label class="control-label" for="username">用户名</label>
+						<div class="controls">
+							<input type="text" class="input-xlarge" id="username" name="username" value="<%= data.username %>">
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="password">密码</label>
+						<div class="controls">
+							<input type="password" class="input-xlarge" id="password" name="password" value="<%= data.password %>">
+						</div>
+					</div>
+					<div class="form-actions">
+						<button type="button" class="btn btn-primary" onclick="loginFn()">登陆</button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+		<div>
+			<a claa="btn" href="/reg">注册</a>
+		</div>
+		<% include footer.html %>
+		
+		
+		<script type="text/javascript">
+			function loginFn(){
+				$.ajax({
+					type:"post",
+					url:"/doLogin",
+					async:true,
+					data:{
+						username:$("#username").val(),
+						password:$("#password").val()
+					},
+					dataType:"json",
+					success:function(data){
+						console.log(data,"succ")
+						if(data.code == 200){
+							$.cookie('node_username',data.username,{
+								  expires:30, 
+								  path:'/'
+							});　
+							$.cookie('node_password',data.password,{
+								  expires:30, 
+								  path:'/'
+							});　
+							setTimeout(function(){
+								window.location.href = "/home";
+							},100);
+						}else{
+							alert(data.msg);
+						}
+						
+					}
+				});
+			}
+		</script>
+	</body>
+
+</html>

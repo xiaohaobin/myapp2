@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<% include header.html %>
+	</head>
+	<body>
+		<% include nav.html %>
+		<p>欢迎来对我</p>
+		<!--<h1>Welcome <%= user.username %>, 欢迎登陆！！</h1>-->
+		<a claa="btn" href="/logout">退出</a>
+		
+		<h1>welcome
+			<span class="username"></span>,
+			欢迎登录！！！
+		</h1>
+		<% include footer.html %>
+		
+		<script type="text/javascript">
+			if($.cookie("node_username")) $(".username").text($.cookie("node_username"));
+		</script>
+	</body>
+</html>
