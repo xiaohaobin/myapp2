@@ -2,14 +2,19 @@ var express = require('express');
 var mysql = require('mysql');
 var bodyParser = require('body-parser');//post请求查询依赖模块
 var dbConfig = require('./db/DBConfig');//引入数据库配置
-var userSQL = require('./db/Usersql');//引入sql语法
+var userSQL = require('./db/Usersql').UserSQL;//引入sql语法
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var common = require('./commonJs/common');//引入公共模块
+var md5 = require('md5');
 
 var app = express();
 var router = express.Router();
 
+// console.log("string类型：123456", md5("123456"));
+// console.log("number类型：123456", md5(123456));
+//console.log("string类型：xhb", md5("xhb"),md5(md5("xhb")));
+ 
 //应用cookie及session
 app.use(cookieParser());
 app.use(
@@ -78,7 +83,7 @@ exports.doLogin = function(req, res,next) {
 			var isTrue = false;
 			if(res) { //获取用户列表，循环遍历判断当前用户是否存在
 				for(var i = 0; i < res.length; i++) {
-					if(res[i].username == UserName && res[i].password == Password) {
+					if(res[i].username == UserName && res[i].password == md5(Password)) {
 						isTrue = true;
 						req.session.user = {
 							username:res[i].username,

@@ -2,8 +2,9 @@ var express = require('express');
 var mysql = require('mysql');
 var bodyParser = require('body-parser');//post请求查询依赖模块
 var dbConfig = require('./db/DBConfig');//引入数据库配置
-var userSQL = require('./db/Usersql');//引入sql语法
+var userSQL = require('./db/Usersql').UserSQL;//引入sql语法
 var common = require('./commonJs/common');//引入公共模块
+var md5 = require('md5');
 
 var app = express();
 var router = express.Router();
@@ -46,7 +47,7 @@ exports.doReg = function(req, res, next) {
 
 		console.log("前台传递参数：", param)
 		var UserName = param.username;
-		var Password = param.password;
+		var Password = md5(param.password);//md5加密一次
 		var _res = res;
 		connection.query(userSQL.queryAll, function(err, res) {
 			var isTrue = false;
@@ -66,7 +67,7 @@ exports.doReg = function(req, res, next) {
 				}; //登录成功返回用户信息
 			} else {
 				console.log([param.username, param.password], 1111);
-				connection.query(userSQL.insert, [param.username, param.password], function(err, result) {
+				connection.query(userSQL.insert, [UserName, Password], function(err, result) {
 					if(result) {
 						data = {
 							code: 200,
