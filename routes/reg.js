@@ -6,6 +6,10 @@ var userSQL = require('./db/Usersql').UserSQL;//引入sql语法
 var common = require('./commonJs/common');//引入公共模块
 var md5 = require('md5');
 
+//调用日志模块输出日志
+var logger = require('../logs/log').logger;
+logger.info('reg模块：生成日志文件')
+
 var app = express();
 var router = express.Router();
 
@@ -86,12 +90,9 @@ exports.doReg = function(req, res, next) {
 			if(err) data.err = err;
 			// 以json形式，把操作结果返回给前台页面
 			setTimeout(function() {
-				common.responseJSON(_res, data)
-				
+				common.responseJSON(_res, data)				
 			}, 300);
-			// responseJSON(_res, data);
-			// 释放链接
-			connection.release();
+			pool.releaseConnection(connection);
 
 		});
 	});

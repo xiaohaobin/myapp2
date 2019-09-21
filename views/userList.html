@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<% include header.html %>
+	</head>
+
+	<body>
+		<% include nav.html %>
+
+		<div id="userList" class="container">
+			<h1>用户列表</h1>
+
+			<div class="flex_space-between">
+				<div>
+					<button type="button" class="btn btn-success" @click="showModal()">新增</button>
+				</div>
+				<div>
+					<div class="form-group">
+						<div class="input-group">
+							<input type="text" class="form-control" id="keyword" placeholder="keyword">
+							<div class="input-group-addon" @click="getListFn(1)">
+								<a href="javascript:;" class="glyphicon glyphicon-search"></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="tableBox">
+				<table class="table table-bordered table-condensed table-hover table-striped table-responsive">
+					<thead>
+						<tr>
+							<th>
+								<input type="checkbox" class="" id="allSelectCheck" @change="allCheckFn()"/>
+							</th>
+							<th>序号</th>
+							<th>姓名</th>
+							<th>手机</th>
+							<th>邮箱</th>
+							<th>账号</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(v,i) in list" v-bind:data-id="v.uid">
+							<td><input type="checkbox" /></td>
+							<td>{{i+1}}</td>
+							<td>{{v.name}}</td>
+							<td>{{v.phone}}</td>
+							<td>{{v.email}}</td>
+							<td>{{v.username}}</td>
+							<td>
+								<div class="btn-group" role="group">
+									<a title="show" class="btn btn-primary">
+										<i class="glyphicon glyphicon-search"></i>
+									</a>
+									<a title="edit" class="btn btn-warning" @click="showModal(v)">
+										<i class="glyphicon glyphicon-edit"></i>
+									</a>
+									<a title="del" class="btn btn-danger" @click="delUserFn_one(v.uid)">
+										<i class="glyphicon glyphicon-trash"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div class="flex_space-between">
+				
+				<div class="allSelectBox">
+					<button type="button" class="btn btn-danger" @click="delUserFn_more()">
+						<i class="glyphicon glyphicon-trash"></i>
+						批量删除
+					</button>
+				</div>
+				
+				<!--分页组件sss-->
+				<nav aria-label="Page navigation">
+					<ul class="pagination">
+						<li class="" @click="changePage(-1)">
+							<a href="#" aria-label="Previous">
+								<span aria-hidden="true">&laquo;</span>
+							</a>
+						</li>
+	
+						<li v-for="v in totalPage" v-bind:class="pageActive(v)" @click="getListFn(v)">
+							<a href="#">{{v}}</a>
+						</li>
+	
+						<li @click="changePage(1)">
+							<a href="#" aria-label="Next">
+								<span aria-hidden="true">&raquo;</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+				<!--分页组件eee-->
+				
+				
+			</div>
+			
+
+			<!--添加，编辑组件sss-->
+			<div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<form class="form" id="form">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title">标题</h4>
+							</div>
+							<div class="modal-body">
+
+								<div class="form-group">
+									<label for="name">姓名</label>
+									<input type="text" class="form-control" id="name" name="name">
+								</div>
+								<div class="form-group">
+									<label for="age">年龄</label>
+									<input type="text" class="form-control" id="age" name="age">
+								</div>
+								<div class="form-group">
+									<label for="phone">手机</label>
+									<input type="text" class="form-control" id="phone" name="phone">
+								</div>
+								<div class="form-group">
+									<label for="email">邮箱</label>
+									<input type="text" class="form-control" id="email" name="email">
+								</div>
+								<div class="form-group">
+									<label for="grade">年级</label>
+									<input type="text" class="form-control" id="grade" name="grade">
+								</div>
+								<div class="form-group">
+									<label for="_class">班级</label>
+									<input type="text" class="form-control" id="_class" name="_class">
+								</div>
+								<div class="form-group">
+									<label for="address">地址</label>
+									<input type="text" class="form-control" id="address" name="address">
+								</div>
+								<div class="form-group">
+									<label for="username">用户名</label>
+									<input type="text" class="form-control" id="username" name="username" @blur="regUserFn()">
+								</div>
+
+							</div>
+							<div class="modal-footer">
+								<!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+								<button type="button" class="btn btn-primary" @click="saveUserInfo()" id="saveUser">Save</button>
+							</div>
+						</form>
+
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+			<!-- /.modal -->
+			<!--添加，编辑组件eee-->
+
+		</div>
+
+		<% include footer.html %>
+
+		<script type="text/javascript">
+			var App = new Vue({
+				el: "#userList",
+				data: {
+					list: [], //主数据
+					total: 0,
+					totalPage: 0,
+					pageNum: 1, //当前页码
+					pageSize: 10, //每一页显示条数
+					keyword: "", //关键字
+					currUid: 0, //当前选中uid
+				},
+				created: function() {
+					//获取用户列表
+					this.getListFn(this.pageNum);
+					
+					
+				},
+				mounted: function() {
+					var _this = this;
+					//监听弹窗关闭
+					$('#myModal').on('hidden.bs.modal', function (e) {
+					  _this.currUid = 0;
+					  $("#form .form-control").val("").removeAttr("readonly");
+					});
+					
+					
+				},
+				updated: function() {
+
+				},
+				watch: {
+					list: function() {
+
+					}
+				},
+				methods: {
+					//获取用户列表
+					getListFn: function(pageNum) {
+						var _this = this;
+						$.ajax({
+							type: "post",
+							url: "/list",
+							async: true,
+							data: {
+								mainId: $.cookie("node_username") || "",
+								pageNum: pageNum,
+								keyword: $("#keyword").val(),
+								pageSize: 10
+							},
+							dataType: "json",
+							success: function(data) {
+								console.log(data, "获取list成功");
+								if(data.code == 200) {
+									_this.list = data.data.list;
+									_this.total = data.data.total;
+									_this.totalPage = data.data.totalPage;
+									_this.pageNum = data.data.pageNum;
+								} else {
+									layer.alert(data.msg)
+								}
+							}
+						});
+					},
+					//返回对应active class
+					pageActive: function(v) {
+						if(v == this.pageNum) {
+							return "active";
+						} else {
+							return "";
+						}
+					},
+					//上下翻页
+					changePage: function(n) {
+						if(n == -1) { //上一页
+							this.pageNum--;
+							if(this.pageNum <= 0) {
+								layer.alert("已经是第一页了");
+								this.pageNum = 1;
+							} else {
+								this.getListFn(this.pageNum);
+							}
+						} else if(n == 1) { //下一页
+							this.pageNum++;
+							if(this.pageNum > this.totalPage) {
+								layer.alert("已经是最后一页了");
+								this.pageNum = this.totalPage;
+							} else {
+								this.getListFn(this.pageNum);
+							}
+						}
+					},
+					//显示模块框
+					showModal: function(v) {						
+						$('#myModal').modal('show');
+						if(v){
+							this.currUid = v.uid;
+							$('[name="name"]').val(v.name);
+							$('[name="age"]').val(v.age);
+							$('[name="phone"]').val(v.phone);
+							$('[name="email"]').val(v.email);
+							$('[name="_class"]').val(v._class);
+							$('[name="grade"]').val(v.grade);
+							$('[name="address"]').val(v.address);
+							$('[name="username"]').val(v.username).attr("disabled","disabled");
+						} 
+					},
+					//保存用户信息(新增，编辑)
+					saveUserInfo:function(){
+						var _this = this;
+						var isNull = false;
+						$("#form .form-control").each(function(){
+							if($(this).val() == ""){
+								isNull = true;
+							}
+						});
+						
+						if(isNull){
+							layer.alert("表单不能为空");
+							return;
+						}
+						
+						
+						var sData = $("#form").serialize();
+						var oData = $.serializeToObj(sData);
+						console.log(oData);
+						oData.mainId = $.cookie("node_username") || "";
+						
+						if(_this.currUid !== 0){
+							oData.uid = _this.currUid;
+						}
+						var _url = (_this.currUid !== 0 ? '/update' : '/add');
+						//return;
+						$.ajax({
+							type: "post",
+							url: _url,
+							async: true,
+							data: oData,
+							dataType: "json",
+							success: function(data) {
+								console.log(data);
+								layer.alert(data.msg,function(){
+									window.location.reload();
+								});
+							
+							}
+						});
+					},
+					//验证用户名是否可以用
+					regUserFn:function(){
+						var _this = this;
+						if($("#username").val() != ""){
+							$.ajax({
+								type: "post",
+								url: "/regUser",
+								async: true,
+								data: {
+									mainId:$.cookie("node_username") || "",
+									username:$("#username").val()
+								},
+								dataType: "json",
+								success: function(data) {
+									console.log(data);
+									if(data.code == -1){
+										layer.alert(data.msg);
+										$("#saveUser").addClass("disabled");
+									}else{
+										$("#saveUser").removeClass("disabled");
+									}
+								}
+							});
+						}
+					},
+					//删除用户(单个)
+					delUserFn_one:function(uid){
+						var index = layer.confirm("是否删除？",function(){							
+							$.ajax({
+								type: "post",
+								url: "/del",
+								async: true,
+//								contentType:"application/json",
+								data: {
+									mainId:$.cookie("node_username") || "",
+									uid:uid
+								},
+								dataType: "json",
+								success: function(data) {
+									console.log(data);
+									layer.alert(data.msg,function(){
+										window.location.reload();
+									});
+								}
+							});
+						});
+					},
+					//删除用户(多个)
+					delUserFn_more:function(){
+						var _this = this;
+						var ids = [];
+						$(".tableBox table tbody td:first-child input").each(function(){
+							if($(this).prop("checked")){
+								var uid = $(this).parents('tr').attr("data-id");
+								ids.push(uid);
+							}
+						});
+						setTimeout(function(){
+							var _ids = ids.join();
+							_this.delUserFn_one(_ids);
+						},100)
+					},
+					//全选逻辑
+					allCheckFn:function(){
+						var checkboxs = $(".tableBox table tbody td:first-child input");
+						var b = $("#allSelectCheck").prop("checked");
+						console.log(b);
+						checkboxs.prop("checked",b);
+					},
+				}
+			});
+		</script>
+	</body>
+
+</html>

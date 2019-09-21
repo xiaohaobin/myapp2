@@ -1,4 +1,7 @@
-//首页，登录皆在此编译业务逻辑
+//调用日志模块输出日志
+var logger = require('../logs/log').logger;
+logger.info('index模块：生成日志文件');
+
 //默认账户密码admin
 var user = {
 	username: 'xhb',
@@ -8,7 +11,7 @@ var user = {
 //默认首页
 exports.index = function(req, res) {
 	res.render('index', {
-		title: 'Index'
+		title: '首页'
 	});
 };
 
@@ -48,8 +51,9 @@ exports.index = function(req, res) {
 exports.home = function(req, res) {
 
 	res.render('home', {
-		title: 'Home',
+		title: '主要页面',
 		user: user
 	});
 };
+
 

@@ -8,6 +8,10 @@ var session = require('express-session');
 var common = require('./commonJs/common');//引入公共模块
 var md5 = require('md5');
 
+//调用日志模块输出日志
+var logger = require('../logs/log').logger;
+logger.info('login模块：生成日志文件')
+
 var app = express();
 var router = express.Router();
 
@@ -39,19 +43,6 @@ app.use(bodyParser.json());
 
 // 使用DBConfig.js的配置信息创建一个MySql链接池
 var pool = mysql.createPool( dbConfig.mysql );
-// 响应一个JSON数据
-//var responseJSON = function (res, ret) {
-//  if (typeof ret === 'undefined') {
-//    res.json({
-//        code: '-200',
-//        msg: '操作失败'
-//    });
-//  } 
-//  else {
-//    res.json(ret);
-//  }
-//};
-
 
 //登录页
 exports.login = function(req, res) {
@@ -116,7 +107,7 @@ exports.doLogin = function(req, res,next) {
             //responseJSON(_res, data);
            
 			// 释放链接
-			connection.release();
+			pool.releaseConnection(connection);
 
 		});
 	});
