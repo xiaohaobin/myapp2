@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>websocket长连接</title>
+		<% include header.html %>
+
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			.clearfix {
+				zoom: 1;
+			}
+			
+			.clearfix:after {
+				clear: both;
+				content: '.';
+				display: block;
+				width: 0;
+				height: 0;
+				visibility: hidden;
+			}
+			
+			.main {
+				width: 100%;
+				height: 100%;
+				font-size: 14px;
+			}
+			
+			.main-top {
+				height: 30px;
+				background-color: #3d3d3d;
+				text-indent: 15px;
+				color: #ffffff;
+				font-size: 16px;
+				line-height: 30px;
+			}
+			
+			.main-body {
+				background-color: #efeff4;
+				/*position: absolute;*/
+				height: 75vh;
+				top: 30px;
+				bottom: 50px;
+				width: 100%;
+				overflow-y: scroll;
+				scrollbar-3dlight-color: ;
+			}
+			
+			.chatRoomInfo {
+				padding: 10px;
+				font-size: 12px;
+				color: #666;
+			}
+			
+			.chatRoomTip {
+				text-align: center;
+				padding: 10px;
+				font-size: 12px;
+				color: #444;
+			}
+			
+			.user {
+				width: 100%;
+				min-height: 38px;
+				min-width: 36px;
+				margin-bottom: 15px;
+			}
+			
+			.user span {
+				float: right;
+			}
+			
+			.user div {
+				float: right;
+				min-height: 38px;
+				min-width: 38px;
+				max-width: 70%;
+				line-height: 38px;
+				padding: 0 15px;
+				color: #FFFFFF;
+				margin-right: 10px;
+				word-break: break-all;
+				background-color: #007aff;
+				position: relative;
+				border-radius: 5px;
+			}
+			
+			.user div:after {
+				content: "";
+				position: absolute;
+				right: -5px;
+				top: 4px;
+				width: 0;
+				height: 0;
+				border-top: solid transparent;
+				border-left: 7px solid #007aff;
+				border-bottom: 4px solid transparent;
+			}
+			
+			.server {
+				width: 100%;
+				min-height: 38px;
+				min-width: 36px;
+				margin-bottom: 15px;
+			}
+			
+			.server span {
+				float: left;
+			}
+			
+			.server div {
+				float: left;
+				min-height: 38px;
+				min-width: 38px;
+				max-width: 70%;
+				line-height: 38px;
+				padding: 0 15px;
+				color: #FFFFFF;
+				margin-left: 10px;
+				word-break: break-all;
+				background-color: #007aff;
+				position: relative;
+				border-radius: 5px;
+			}
+			
+			.server div:after {
+				content: "";
+				position: absolute;
+				left: -5px;
+				top: 4px;
+				width: 0;
+				height: 0;
+				border-top: solid transparent;
+				border-right: 7px solid #007aff;
+				border-bottom: 4px solid transparent;
+			}
+			
+			.main-footer {
+				position: absolute;
+				bottom: 0;
+				width: 100%;
+				height: 50px;
+			}
+			
+			.input {
+				float: left;
+				width: 80%;
+				height: 40px;
+				margin-top: 5px;
+				margin-left: 1%;
+				margin-right: 1%;
+				border: 1px solid #666666;
+			}
+			
+			.input input {
+				width: 100%;
+				height: 40px;
+				outline: none;
+				border: none;
+				font-size: 14px;
+				color: #333;
+			}
+			
+			.send {
+				float: left;
+				width: 16%;
+				height: 40px;
+				margin-top: 5px;
+				margin-left: 1%;
+				border: none;
+				background-color: #e8e8e8;
+				color: #007aff;
+				outline: none;
+			}
+		</style>
+	</head>
+
+	<body>
+		<% include nav.html %>
+
+		<div class="container">
+			<h2>websocket长连接</h2>
+			<h3>后台携带数据：<%= title %></h3>
+		</div>
+
+		<% include footer.html %>
+
+		<div class="main">
+			<div class="main-top">
+				socket.io demo
+			</div>
+			<div class="main-body">
+				<section class="chatRoomInfo">
+					<div class="info">当前共有<span class="chatNum">0</span>人在线。在线列表:&nbsp;<span class="chatList"></span></div>
+				</section>
+				<!--<section class="chatRoomTip">
+	                <div>子木加入到聊天室</div>
+	            </section>
+	            <section class="user clearfix">
+	                <span>子木</span>
+	                <div>
+	                    测试测试测试测试测试测试测试测试测试试测试测试测试测试测试测试测试测试测试测试测试
+	                </div>
+	            </section>
+	            <section class="server clearfix">
+	                <span>子木</span>
+	                <div>
+	                    测试测试测试
+	                </div>
+	            </section>-->
+			</div>
+			<div class="main-footer clearfix">
+				<div class="input">
+					<input type="text" name="msg" id="msg" value="" />
+				</div>
+				<button type="button" class="send">发送</button>
+			</div>
+		</div>
+
+		<script src="/lib/socket.io/dist/socket.io.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			/*按钮点击效果*/
+			$('.send').mousedown(function() {
+				$(this).css({
+					'background': "#007aff",
+					'color': "#ffffff"
+				});
+			})
+			$('.send').mouseup(function() {
+				$(this).css({
+					'background': "#e8e8e8",
+					'color': "#ffffff"
+				});
+			})
+
+			/*socket*/
+			window.onload = function() {
+				//连接socket后端服务器
+				var socket = io.connect("ws://127.0.0.1:4000"); //后台开放端口和ip
+				if($.cookie("node_username")){
+					var username = $.cookie("node_username");
+					
+					userId = genUid();
+					var userInfo = {
+						'userid': userId,
+						'username': username
+					};
+													
+					//通知用户有用户登录
+					socket.emit('login', userInfo);//注册login事件发送给后台()
+					//监听新用户登录
+					socket.on('login', function(o) {//监听后台的login事件(监听所有人登录)
+						updateMsg(o, 'login');
+					});
+					socket.on('ownLogin', function(o) {//监听后台的事件（监听自己登录）
+						updateMsg(o, 'ownLogin');
+					});
+					//监听用户退出
+					socket.on('logout', function(o) {
+						updateMsg(o, 'logout');
+					});
+					//发送消息
+					socket.on('message', function(obj) {
+						if(obj.userid == userId) {
+							var MsgHtml = '<section class="user clearfix">' +
+								'<span>' + obj.username + '</span>' +
+								'<div>' + obj.content + '</div>' +
+								'</section>';
+						} else {
+							var MsgHtml = '<section class="server clearfix">' +
+								'<span>' + obj.username + '</span>' +
+								'<div>' + obj.content + '</div>' +
+								'</section>';
+						}
+						$('.main-body').append(MsgHtml);
+						$('.main-body').scrollTop(99999);
+					})
+					$('.send').click(function() {
+						var content = $('input[name="msg"]').val();
+						if(content) {
+							var obj = {
+								'userid': userId,
+								'username': username,
+								'content': content
+							}
+							socket.emit('message', obj);
+							$('input[name="msg"]').val("");
+						}
+					})
+					
+				}else{
+					layer.alert("用户没有登录，请重新登录！",function(){
+						window.location.href = "/login";
+					});
+				}
+				
+			}
+
+			function enterNameFn(callback) {
+				var lay_p = layer.prompt(
+					{
+						title: "请输入名称！",
+					}, function(v) {
+						console.log(v);
+						layer.close(lay_p);
+						if(callback) callback(v);
+					},
+					function(i){
+						console.log(i,'取消操作')
+					}
+				);
+			}
+
+			/*用户id生成*/
+			function genUid() {
+				return new Date().getTime() + "" + Math.floor(Math.random() * 899 + 100);
+			}
+
+			function logout() {
+				console.log('有人退出来了')
+				socket.disconnect();
+				location.reload();
+			}
+			/*监听函数*/
+			function updateMsg(o, action) {
+				//当前在线列表
+				var onlineUser = o.onlineUser;
+				//当前在线数
+				var onlineCount = o.onlineCount;
+				//新加用户
+				var user = o.user;
+				//更新在线人数
+				var userList = '';
+				var separator = '';
+				for(key in onlineUser) {
+					userList += separator + onlineUser[key];
+					separator = '、';
+				}
+				//跟新房间信息
+				$('.chatNum').text(onlineCount);
+				$('.chatList').text(userList);
+				//系统消息
+				if(action == 'login') {
+					var sysHtml = '<section class="chatRoomTip"><div><b style="color:red;"> ' + user.username + '</b>鬼鬼祟祟的进入聊天室('+ $.formatDateTime(new Date()) +')</div></section>';
+					$(".main-body").append(sysHtml);
+					$('.main-body').scrollTop(99999);
+				}
+				if(action == "logout") {
+					var sysHtml = '<section class="chatRoomTip"><div><b style="color:red;"> ' + user.username + '</b>骂骂咧咧的退出聊天室('+ $.formatDateTime(new Date()) +')</div></section>';
+					$(".main-body").append(sysHtml);
+					$('.main-body').scrollTop(99999);
+				}
+				if(action == "ownLogin"){
+					layer.msg("伟大的<b style='color:green;'> "+ user.username +" </b>大神，欢迎您归来！");
+				}
+				
+			}
+
+			
+		</script>
+	</body>
+
+</html>

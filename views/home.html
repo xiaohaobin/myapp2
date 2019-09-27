@@ -15,10 +15,31 @@
 			<span class="username"></span>,
 			欢迎登录！！！
 		</h1>
+		<div class="container">
+			<button class="btn btn-success" onclick="valTokenFn()">验证token</button>
+		</div>
+		
 		<% include footer.html %>
 		
 		<script type="text/javascript">
 			if($.cookie("node_username")) $(".username").text($.cookie("node_username"));
+			
+			function valTokenFn(){
+//				$.ajax({
+//					type:"post",
+//					url:"/vertify",
+//					async:true,
+//                  headers:{
+//                  	authorization:$.cookie("node_token")
+//                  },
+//					data:{
+//						
+//					},
+//					success:function(data){
+//						console.log(data);
+//					}
+//				});
+			}
 		</script>
 	</body>
 </html>

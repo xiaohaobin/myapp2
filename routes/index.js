@@ -1,3 +1,4 @@
+var common = require('./commonJs/common'); //引入公共模块
 //调用日志模块输出日志
 var logger = require('../logs/log').logger;
 logger.info('index模块：生成日志文件');
@@ -49,7 +50,19 @@ exports.index = function(req, res) {
 
 //登录成功之页面
 exports.home = function(req, res) {
-
+	//验证token唯一代码==================================================
+//	console.log(req.cookies,"主页面");
+//	if(common.typeData(req.session.userSSH)){
+//		console.log('用户的session存在，可以访问');
+//	}else if (common.typeData(req.cookies.userSSH)) {
+//	    console.log('用户的cookie存在，需要验证');
+//	    res.redirect('/enterToken');
+//	} else {
+//	    console.log('用户的cookie不存在，需要登录');
+//	   res.redirect('/login');
+//	}
+	//验证token唯一代码==================================================
+	
 	res.render('home', {
 		title: '主要页面',
 		user: user

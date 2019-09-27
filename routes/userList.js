@@ -7,27 +7,18 @@ var cookieParser = require('cookie-parser');
 //var session = require('express-session');
 var common = require('./commonJs/common'); //引入公共模块
 var md5 = require('md5');
+var vTokenRoutes = require('./token_vertify');//token相关
+
 
 //调用日志模块输出日志
 var logger = require('../logs/log').logger;
 logger.info('userList模块：生成日志文件')
 
-var app = express();
-var router = express.Router();
 
-// post请求配置  parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({
-	extended: false
-}));
-// parse application/json
-app.use(bodyParser.json());
 
 // 使用DBConfig.js的配置信息创建一个MySql链接池
 var pool = mysql.createPool(dbConfig.mysql);
 
-function handleError(){
-	
-}
 
 
 //port：页面入口，用户列表模块
@@ -41,6 +32,14 @@ module.exports = {
 	},
 	//获取列表
 	list: function(req, res, next) {
+		
+		//验证是否有token
+		var Pass = vTokenRoutes.postValToken(req, res, next);
+		if(!Pass.isPass){
+			return Pass.callback();
+		}
+		//验证是否有token
+		
 		// 从连接池获取连接
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
@@ -96,6 +95,12 @@ module.exports = {
 	},
 	//验证用户名信息
 	regUser:function(req, res, next){
+		//验证是否有token
+		var Pass = vTokenRoutes.postValToken(req, res, next);
+		if(!Pass.isPass){
+			return Pass.callback();
+		}
+		//验证是否有token
 		// 从连接池获取连接
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
@@ -135,6 +140,12 @@ module.exports = {
 	},
 	//添加用户
 	add:function(req, res, next){
+		//验证是否有token
+		var Pass = vTokenRoutes.postValToken(req, res, next);
+		if(!Pass.isPass){
+			return Pass.callback();
+		}
+		//验证是否有token
 		// 从连接池获取连接
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
@@ -177,6 +188,12 @@ module.exports = {
 	},
 	//更新用户信息
 	update:function(req, res, next){
+		//验证是否有token
+		var Pass = vTokenRoutes.postValToken(req, res, next);
+		if(!Pass.isPass){
+			return Pass.callback();
+		}
+		//验证是否有token
 		// 从连接池获取连接
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
@@ -217,6 +234,12 @@ module.exports = {
 	},
 	//删除用户信息
 	del:function(req, res, next){
+		//验证是否有token
+		var Pass = vTokenRoutes.postValToken(req, res, next);
+		if(!Pass.isPass){
+			return Pass.callback();
+		}
+		//验证是否有token
 		// 从连接池获取连接
 		pool.getConnection(function(err, connection) {
 			// 获取前台页面传过来的参数
