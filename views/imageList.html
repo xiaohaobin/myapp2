@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>图片列表</title>
+		<% include header.html %>
+	</head>
+
+	<body>
+		<% include nav.html %>
+
+		<div class="container">
+			<div>
+				<form action="#" method="post" enctype="multipart/form-data" id="form">
+					<div class="form-group">
+						<label for="title">标题</label>
+						<input type="text" class="form-control" id="title" placeholder="标题" name="title">
+					</div>
+					<div class="form-group">
+						<label for="file_name">File input</label>
+						<input type="file" id="file_name" name="image">
+						<p class="help-block">上传图片.</p>
+					</div>
+					
+					
+					<button type="button" class="btn btn-success" onclick="fileUploadFn()">提交 </button>
+					<!--<button type="submit" class="btn btn-success" >提交 </button>-->
+				</form>
+			</div>
+		</div>
+
+		<% include footer.html %>
+
+		<script type="text/javascript">
+			function fileUploadFn() {
+				var form = document.getElementById("form");
+				var formData = new FormData(form);
+				
+				//包含文件上传的的数据提交
+				$.ajax_method_2(
+					'/addImage',
+					formData,
+					'post',
+					function(data){
+						console.log(data, "req success");
+					}
+				);
+			}
+		</script>
+	</body>
+
+</html>

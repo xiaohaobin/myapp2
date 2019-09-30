@@ -8,7 +8,7 @@ var onlineUser={};
 var onlineCount=0;
 
 //调用日志模块输出日志
-var logger = require('../logs/log').logger;
+var logger = require('../../logs/log').logger;
 logger.info('websocket模块：生成日志文件');
 
 

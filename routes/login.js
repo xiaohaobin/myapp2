@@ -35,7 +35,8 @@ exports.login = function(req, res) {
 
 //登录请求
 exports.doLogin = function(req, res,next) {
-
+//	res.cookie('name', 'xiaohaobin', {path: '/',expires: new Date(Date.now() + 900000), httpOnly: true,secure: false, signed: false });
+	
 	// 从连接池获取连接
 	pool.getConnection(function(err, connection) {
 		// 获取前台页面传过来的参数
@@ -47,6 +48,8 @@ exports.doLogin = function(req, res,next) {
 		var uid = "";
 		var _res = res;
 		connection.query(userSQL.queryAll, function(err, res) {
+			
+			
 			var isTrue = false;
 			if(res) { //获取用户列表，循环遍历判断当前用户是否存在
 				for(var i = 0; i < res.length; i++) {
@@ -65,7 +68,6 @@ exports.doLogin = function(req, res,next) {
 			if(err) data.err = err;
 			if(isTrue){
 				//验证通过就直接跳转到/home
-//				res.redirect('/home');
 				data.code = 200,
 				data.msg = 'success';
 				data.username = UserName;
@@ -74,6 +76,13 @@ exports.doLogin = function(req, res,next) {
 				//设置token======================================================================				
 				var sToken = vTokenRoutes.setToken2({uid});
 				data.token = sToken;
+				//更新数据库token字段
+				connection.query(dbConfig.verifyTkoenSql,[sToken,UserName],function(err, res){
+					if(err){
+						common.responseJSON(_res, {code:-1,msg:"token插入失败",err:err});
+					}
+				});
+				
 				//设置token======================================================================
 				
 			}else{

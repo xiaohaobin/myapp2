@@ -208,21 +208,15 @@
 					//获取用户列表
 					getListFn: function(pageNum) {
 						var _this = this;
-						$.ajax({
-							type: "post",
-							url: "/list",
-							async: true,
-							headers:{
-		                    	authorization:$.cookie("node_token")
-		                    },
-							data: {
-								mainId: $.cookie("node_username") || "",
+						$.ajaxFn(
+							"/list",
+							{
 								pageNum: pageNum,
 								keyword: $("#keyword").val(),
 								pageSize: 10
 							},
-							dataType: "json",
-							success: function(data) {
+							"post",
+							function(data){
 								console.log(data, "获取list成功");
 								if(data.code == 200) {
 									_this.list = data.data.list;
@@ -233,7 +227,7 @@
 									layer.alert(data.msg)
 								}
 							}
-						});
+						);
 					},
 					//返回对应active class
 					pageActive: function(v) {
@@ -292,78 +286,60 @@
 							layer.alert("表单不能为空");
 							return;
 						}
-						
-						
+												
 						var sData = $("#form").serialize();
 						var oData = $.serializeToObj(sData);
-						console.log(oData);
-						oData.mainId = $.cookie("node_username") || "";
 						
 						if(_this.currUid !== 0){
 							oData.uid = _this.currUid;
 						}
 						var _url = (_this.currUid !== 0 ? '/update' : '/add');
-						//return;
-						$.ajax({
-							type: "post",
-							url: _url,
-							async: true,
-							data: oData,
-							dataType: "json",
-							success: function(data) {
+						$.ajaxFn(
+							_url,
+							oData,
+							"post",
+							function(data){
 								console.log(data);
 								layer.alert(data.msg,function(){
 									window.location.reload();
 								});
-							
 							}
-						});
+						);
 					},
 					//验证用户名是否可以用
 					regUserFn:function(){
 						var _this = this;
-						if($("#username").val() != ""){
-							$.ajax({
-								type: "post",
-								url: "/regUser",
-								async: true,
-								data: {
-									mainId:$.cookie("node_username") || "",
-									username:$("#username").val()
-								},
-								dataType: "json",
-								success: function(data) {
+						if($("#username").val() != ""){							
+							
+							$.ajaxFn(
+								'/regUser',
+								{username:$("#username").val()},
+								"post",
+								function(data){
 									console.log(data);
-									if(data.code == -1){
-										layer.alert(data.msg);
-										$("#saveUser").addClass("disabled");
-									}else{
+									if(data.code == 200){
 										$("#saveUser").removeClass("disabled");
+									}else{
+										$("#saveUser").addClass("disabled");
 									}
 								}
-							});
+							);
 						}
 					},
 					//删除用户(单个)
 					delUserFn_one:function(uid){
-						var index = layer.confirm("是否删除？",function(){							
-							$.ajax({
-								type: "post",
-								url: "/del",
-								async: true,
-//								contentType:"application/json",
-								data: {
-									mainId:$.cookie("node_username") || "",
-									uid:uid
-								},
-								dataType: "json",
-								success: function(data) {
-									console.log(data);
+						var index = layer.confirm("是否删除？",function(){									
+							$.ajaxFn(
+								'/del',
+								{uid:uid},
+								"post",
+								function(data){
 									layer.alert(data.msg,function(){
 										window.location.reload();
 									});
 								}
-							});
+							);
+							
 						});
 					},
 					//删除用户(多个)

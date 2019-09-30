@@ -55,8 +55,9 @@ exports.postValToken = function(req, res, next){
 		if(r && r.uid){
 			console.log("验证通过")			
 			return {
-				code:1,
-				isPass:true
+				code:200,
+				isPass:true,
+				token:token
 			};
 		}else{
 			return {
@@ -64,7 +65,7 @@ exports.postValToken = function(req, res, next){
 				isPass:false,
 				callback:function(){
 					res.json({
-						code:-200,
+						code:-1,
 						msg:"token失效,请重新登录"
 					})
 				}
@@ -76,7 +77,7 @@ exports.postValToken = function(req, res, next){
 			isPass:false,
 			callback:function(){
 				res.json({
-					code:-200,
+					code:-1,
 					msg:"token缺省,请登录"
 				})
 			}
@@ -84,4 +85,33 @@ exports.postValToken = function(req, res, next){
 	}
 	
 //	next();
+}
+
+
+ /**
+ * 查询数据库表验证token
+ * @param {Object} connection 连接的数据库进程
+ * @param {String} sUsername 账户名
+ * @param {Function} callback 回调函数
+ * */
+exports.verifyTokenFn = function(connection,sUsername,sToken,callback){
+	connection.query('SELECT * FROM node_user', function(err, res){
+		var oItem = res.find(function(item){
+			return item.username == sUsername;
+		});
+		if(oItem.token){
+			var r = verToken2(sToken);
+			if(r && r.uid){
+				if(sToken == oItem.token){
+					callback({isPass:true,msg:"token验证通过"});
+				}else{
+					callback({isPass:false,msg:"token已经过期失效,请重新登录"});
+				}
+			}else{
+				callback({isPass:false,msg:"token已经过期失效,请重新登录"});
+			}
+		}else{
+			callback({isPass:false,msg:"账户id无效"});
+		}
+	});
 }

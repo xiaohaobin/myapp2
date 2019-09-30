@@ -7,6 +7,11 @@ module.exports = {
 	 * @param {Object} ret 返回json数据
 	 * */
 	responseJSON:function(res, ret){
+		/*
+		 * code 200  成功
+		 * code -1，-200   失败
+		 * code 0  用户认证 失败  ，重新登录
+		 * */
 		if (typeof ret === 'undefined') {
 	      res.json({
 	          code: '-200',
@@ -51,5 +56,24 @@ module.exports = {
 			httpOnly: true,
 			maxAge: 60 * 60 * 1000 // 超时时间，设置1小时
 		}
-	}
+	},
+	/**
+	 * 标准时间返回 y-m-d h:m:s格式
+	 * @param {Object} date 当前时间对象
+	 * @return {String}
+	 * */
+	formatDateTime: function(date) {
+		var y = date.getFullYear();
+		var m = date.getMonth() + 1;
+		m = m < 10 ? ('0' + m) : m;
+		var d = date.getDate();
+		d = d < 10 ? ('0' + d) : d;
+		var h = date.getHours();
+		h = h < 10 ? ('0' + h) : h;
+		var minute = date.getMinutes();
+		minute = minute < 10 ? ('0' + minute) : minute;
+		var second = date.getSeconds();
+		second = second < 10 ? ('0' + second) : second;
+		return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+	},
 }
